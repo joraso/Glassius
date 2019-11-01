@@ -24,7 +24,7 @@ void Protocol::KobAndersonReplication(double Temp, double relax, Stopwatch* time
     timer->StampComplete();
     
     std::cout << "\n" << "Setting up Simulation..." << std::endl;
-    Verlet Simulation(&System, 0.01, 10);
+    Verlet Simulation(&System, 5, 0.01, 10);
     timer->StampComplete();
     
     
@@ -39,8 +39,8 @@ void Protocol::KobAndersonReplication(double Temp, double relax, Stopwatch* time
     std::cout << "Running for t = " << relax << std::endl;
     std::cout << "Recording every = " << Simulation.GetRecord() << std::endl;
     std::cout << "Thermostating every 50 timesteps" << std::endl;
-    System.setTemp(Temp);
-    System.Thermalize();
+    Simulation.SetTemp(Temp);
+    System.Thermalize(Temp);
     Simulation.Equilibrate(relax, 50);
     timer->StampComplete();
     
@@ -79,7 +79,7 @@ void Protocol::KobAndersonTest( double relax ,Stopwatch* timer){
     timer->StampComplete();
     
     std::cout << "\n" << "Setting up Simulation..." << std::endl;
-    Verlet Simulation(&System, 0.01, 1);
+    Verlet Simulation(&System, 5.0, 0.01, 1);
     timer->StampComplete();
     
     
@@ -120,7 +120,7 @@ void Protocol::LennardJonesTest(double Temp, double relax, Stopwatch* timer){
     timer->StampComplete();
     
     std::cout << "\n" << "Setting up Simulation..." << std::endl;
-    Verlet Simulation(&System, 0.01, 1);
+    Verlet Simulation(&System, Temp, 0.01, 1);
     timer->StampComplete();
     
     std::cout << "\n" << "Equilibrating at T = " << Temp << std::endl;
@@ -142,3 +142,81 @@ void Protocol::LennardJonesTest(double Temp, double relax, Stopwatch* timer){
     
     return;
 }
+
+void Protocol::DiffusionTest(double Temp, double relax, Stopwatch* timer){
+
+    std::cout <<"\n"<< "Diffusion Testing Brownian Integrator" <<"\n"<< std::endl;
+    
+    double rho = 1000 / (9.4*9.4*9.4);
+    //double rho = 1;
+    
+    std::cout << "\n" << "Setting up System..." << std::endl;
+    Free System(rho, Temp, 10);
+    timer->StampComplete();
+    
+    std::cout << "\n" << "Setting up Simulation..." << std::endl;
+    Brownian Simulation(&System, 1.0, 1.0, 0.00005, 1);
+    timer->StampComplete();
+    
+    std::cout << "\n" << "Begining Production Run" << std::endl;
+    std::cout << "Using Parameters:" << std::endl;
+    double dt = Simulation.Getdt();
+    std::cout << "Timestep = " << dt << std::endl;
+    Simulation.Propigate();
+    int Npoints = 100;
+    std::cout << "Total Data Points = " << Npoints << std::endl;
+    int Nrec = int( relax / (dt*Npoints) );
+    Simulation.SetRecord(Nrec);
+    std::cout << "Recording every = " << Simulation.GetRecord() << std::endl;
+    Simulation.Run(relax);
+    timer->StampComplete();
+    
+    return;
+}
+
+void Protocol::SzamelTest(double Temp, double relax, Stopwatch* timer){
+
+    std::cout <<"\n"<< "Testing Szamel Brownian Glass" <<"\n"<< std::endl;
+    std::cout << "Using Parameters:" << std::endl;
+    //std::cout << "Temperature = " << Temp << std::endl;
+    std::cout << "RelaxationTime =  " << relax << std::endl;
+    
+    double rho = 1000 / (9.4*9.4*9.4);
+    
+    std::cout << "Density = " << rho << std::endl;
+    std::cout << "Boxlength = 9.4" << std::endl;
+    
+    std::cout << "\n" << "Setting up System..." << std::endl;
+    Glass System(rho, 5.0, 10);
+    timer->StampComplete();
+    
+    //std::cout << "\n" << "Setting up Simulation..." << std::endl;
+    //Verlet Simulation(&System, 5.0, 0.01, 1);
+    //timer->StampComplete();
+    
+    
+    std::cout << "\n" << "Equilibrating (Verlet) at T = 5.0" << std::endl;
+    std::cout << "Running for t = 100" << std::endl;
+    Verlet Mixer(&System, 5.0, 0.01, 1);
+    std::cout << "Recording every = " << Mixer.GetRecord() << std::endl;
+    std::cout << "Thermostating every 100 timesteps" << std::endl;
+    Mixer.Equilibrate(relax, 100);
+    timer->StampComplete();
+ 
+    std::cout << "\n" << "Begining Production (Brownian) Run" << std::endl;
+    Brownian Simulation(&System, Temp, 1.0, 0.00005, 1);
+    std::cout << "Using Parameters:" << std::endl;
+    double dt = Simulation.Getdt();
+    std::cout << "Temperature = " << Simulation.Temperature() << std::endl;
+    std::cout << "Timestep = " << dt << std::endl;
+    int Npoints = 10000;
+    std::cout << "Total Data Points = " << Npoints << std::endl;
+    int Nrec = int( relax / (dt*Npoints) );
+    Simulation.SetRecord(Nrec);
+    std::cout << "Recording every = " << Simulation.GetRecord() << std::endl;
+    Simulation.Run(relax);
+    timer->StampComplete();
+    
+    return;
+}
+

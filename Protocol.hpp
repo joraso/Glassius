@@ -19,13 +19,16 @@ invoked in main.cpp
 
 
 namespace Protocol {
+    // Szamel Test
+    void SzamelTest(double, double, Stopwatch*);
+    // Diffusion testing for the ODB integrator.
+    void DiffusionTest(double, double, Stopwatch*);
     // Replication of the Kob-Anderson paper 
     void KobAndersonReplication(double, double, Stopwatch*);
     // KA Testing: mixing, equilibration etc.
     void KobAndersonTest(double, Stopwatch*);
     // LJ Testing mixing equilibration etc.
     void LennardJonesTest(double, double, Stopwatch*);
-    
 }
 
 #endif /*Protocol_hpp*/

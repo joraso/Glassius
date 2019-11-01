@@ -23,10 +23,9 @@ class Particles{
     /* Base class for systems of monatomic Lennard-Jones Particles */
     public:
         // Constructors
-        Particles(double rho, double T, int Nside):
-            rho(rho), T(T), Nside(Nside),
-            time(0), kinetic_energy(0), potential_energy(0)
-            {Initialize();};
+        Particles(double rho, int Nside):
+            rho(rho), Nside(Nside), time(0),
+            kinetic_energy(0), potential_energy(0) {Initialize();};
         void Initialize();
         // Accessors
         double** r;
@@ -42,10 +41,9 @@ class Particles{
         inline double Number(){return N;};
         inline double Time(){return time;};
         inline void setTime(double t){time = t;};
-        inline void setTemp(double temperature){T = temperature;}
         // Common Operations
         void UpdateKinetic();
-        void Thermalize();
+        void Thermalize(double Temp);
         // Integration calculations
         virtual void UpdateForces(){return;};
         // File Operations 
@@ -54,15 +52,23 @@ class Particles{
     protected:
         Matrix positions, velocities, forces;
         int N, Nside;
-        double lengthscale, sidelength, rho, T, time;
+        double lengthscale, sidelength, rho, time;
         double kinetic_energy, potential_energy;
+};
+
+class Free: public Particles {
+    /* Derived class for a system of free particles */
+    public:
+        Free(double rho, double T, double nside):
+            Particles(rho, nside) {UpdateForces(); Thermalize(T);};
+        void UpdateForces();
 };
 
 class Fluid: public Particles {
     /* Derived class for simple Lennard-Jones fluid */
     public:
         Fluid(double rho, double T, double nside):
-            Particles(rho, T, nside){UpdateForces(); Thermalize();};
+            Particles(rho, nside) {UpdateForces(); Thermalize(T);};
         void UpdateForces();
     //protected:
 };
@@ -71,7 +77,7 @@ class Glass: public Particles {
     /* Derived class for the Kob-Anderson glass mixture */
     public:
         Glass(double rho, double T, double nside):
-            Particles(rho, T, nside){UpdateForces(); Thermalize();};
+            Particles(rho, nside) {UpdateForces(); Thermalize(T);};
         void UpdateForces();
     protected:
         int Na = int(0.8*N);

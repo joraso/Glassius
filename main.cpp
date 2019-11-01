@@ -31,9 +31,11 @@ int main(int argc, const char * argv[]) {
     chaos::seed(JobID);
     
     // running the protocol
-    Protocol::KobAndersonReplication(T, relax, &timer);
+    //Protocol::KobAndersonReplication(T, relax, &timer);
     //Protocol::KobAndersonTest(100, &timer);
     //Protocol::LennardJonesTest(5.0 ,1000, &timer);
+    //Protocol::DiffusionTest(T, relax, &timer);
+    Protocol::SzamelTest(T, relax, &timer);
 
     // timestamping the end
     timer.EndStamp();

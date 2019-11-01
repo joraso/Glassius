@@ -42,7 +42,7 @@ void chaos::test(int n){
     
     for(int i=0;i<n;i++){
         // change the function you want to test here:
-        r = gaussian(3.0, 2);
+        r = gaussian(0.0, 1);
         chaosfile << r << std::endl;
     }
     chaosfile.close();

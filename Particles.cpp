@@ -22,6 +22,11 @@ void Particles::Initialize(){
     lengthscale = pow(rho, -1.0/3.0);
     sidelength = lengthscale*Nside;
     
+    //std::cout << "Sidelength is " << sidelength << std::endl;
+    //std::cout << "lengthscale is " << lengthscale << std::endl;
+    //std::cout << "N is " << N << std::endl;
+    //std::cout << "Nside is " << Nside << std::endl;
+    
     // Setting up the trajectory matrices. Note the dimensionality is hard-
     // coded to 3.
     positions = Matrix(N,3);
@@ -37,6 +42,8 @@ void Particles::Initialize(){
     
     // initializing positions, velocities.
     for(zi=0;zi<Nside;zi++){
+       //std::cout << "zi=" << zi << std::endl;
+       //std::cout << "zcoord=" << lengthscale*(zi+0.5) << std::endl;
        for(yi=0;yi<Nside;yi++){
          for(xi=0;xi<Nside;xi++){
             r[n][0] = lengthscale*(xi+0.5);
@@ -101,7 +108,7 @@ void Particles::UpdateKinetic(){
     return;
 }
 
-void Particles::Thermalize(){
+void Particles::Thermalize(double Temp){
     /* Thermostats the particle system to temperature T by rescaling the
     velocities of all the particles to be in line with the KE based on the
     ideal gas temperature. Not sure if this belongs here or in the integrator
@@ -109,7 +116,7 @@ void Particles::Thermalize(){
     int i, k;
 
     // figuring out the factor needed to readjust the velocities.
-    double KEnew = (0.5)*3*T*(N-1);
+    double KEnew = (0.5)*3*Temp*(N-1);
     double scale_factor = sqrt( KEnew / kinetic_energy );
     
     // Zeros KE
@@ -125,10 +132,20 @@ void Particles::Thermalize(){
     return;
 }
 
+/* The Free particle model -------------------------------------------------- */
+
+void Free::UpdateForces(){
+    int i, k;
+    // Zero out the forces and potential energy
+    for(i=0;i<N;i++){for(k=0;k<3;k++){f[i][k]=0;};};
+    potential_energy = 0;
+    return;
+}
+
 /* The Lennard-Jones Fluid -------------------------------------------------- */
 
 void Fluid::UpdateForces(){
-    /* Excicutes the forceloop for the simple Lennard-Jones fluid, updating the
+    /* Exicutes the forceloop for the simple Lennard-Jones fluid, updating the
     forces and potential energy. */
     int i, j, k;
     
