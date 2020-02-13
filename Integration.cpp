@@ -20,7 +20,7 @@ void Integrator::Equilibrate(double t, int Nthermalize){
     
     // Prepping output file
     std::ofstream energyfile;
-    energyfile.open("Data/Energies.csv", std::ios::app);
+    energyfile.open(efilename, std::ios::app);
     
     // File check-stop
     if(!energyfile.is_open()){
@@ -38,8 +38,7 @@ void Integrator::Equilibrate(double t, int Nthermalize){
         energyfile << System->KE() << ", ";
         energyfile << System->PE() << ", ";
         energyfile << System->TotalEnergy() << std::endl;
-        /*Uncomment to print trajectory during equilibration.*/
-        //System->SaveTrajectory(); 
+        if (recordtraj) {System->SaveTrajectory();};
     }
     
     // Closing the energy file
@@ -64,7 +63,7 @@ void Integrator::Run(double t){
     
     // Prepping output file
     std::ofstream energyfile;
-    energyfile.open("Data/Energies.csv", std::ios::app);
+    energyfile.open(efilename, std::ios::app);
     
     // File check-stop
     if(!energyfile.is_open()){
@@ -79,7 +78,7 @@ void Integrator::Run(double t){
         energyfile << System->KE() << ", ";
         energyfile << System->PE() << ", ";
         energyfile << System->TotalEnergy() << std::endl;
-        System->SaveTrajectory();
+        if (recordtraj) {System->SaveTrajectory();};
     }
     
     // Closing the energy file
@@ -120,7 +119,7 @@ void Verlet::Propigate(){
 void Brownian::Initialize(){
     // Setting stuff up
     int i,k;
-    prefactor = sqrt(2*dt*(Temp));
+    prefactor = sqrt(2*dt*Temp);
     int N = System->Number();
     randomforce = Matrix(N, 3);
     F0 = Matrix(N, 3);

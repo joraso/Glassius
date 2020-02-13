@@ -15,25 +15,29 @@ allowing the type of particle system to be switched out.
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <string>
 #include "Particles.hpp"
 #include "chaos.hpp"
 
 class Integrator {
     /* Base class for integration functions. */
     public:
-        // Constructors
+        // Constructor
         Integrator(Particles* system, double Temp, double dt, int Nrecord):
-            System(system), Temp(Temp), dt(dt), Nrecord(Nrecord), time(0) {};
+            System(system), Temp(Temp), dt(dt), Nrecord(Nrecord), time(0),
+            efilename("Data/Energies.csv"), recordtraj(false) {};
         // Accessors
         inline double Temperature() {return Temp;};
         inline void SetTemp(double T) {Temp = T;};
         inline double Time() {return time;};
-        inline void Setdt(double t) {dt = t;};
+        inline void SetTime(double t) {System->setTime(t);};
         inline double Getdt() {return dt;};
-        inline void SetRecord(double n) {Nrecord = n;}
+        inline void Setdt(double t) {dt = t;};
         inline int GetRecord() {return Nrecord;};
-        // Accessors
-        inline Particles GetSystem() {return *System;};
+        inline void SetRecord(int n) {Nrecord = n;}
+        // Switches & Filenames
+        inline void SetEnergyFile(string name) {efilename = name;};
+        inline void RecordTrajectory(bool rt) {recordtraj = rt;};
         // Inheritor calculations
         void Equilibrate(double t, int Nthermalize);
         void Run(double t);
@@ -41,8 +45,12 @@ class Integrator {
         virtual void Propigate(){return;};
     protected:
         Particles* System;
+        // Parameters
         double Temp, dt, time;
         int Nrecord;
+        // File names and Flags
+        string efilename;
+        bool recordtraj;
 };
 
 class Verlet: public Integrator {

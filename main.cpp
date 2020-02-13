@@ -13,15 +13,17 @@ Copyright © 2019 Joe Raso, All rights reserved.
 int main(int argc, const char * argv[]) {
 
     // Check:
-    if(argc != 4){
+    if(argc != 6){
         std::cout << "Error: wrong number of command line inputs!" << std::endl;
         return 1;
     }
 
     // Current command line arguments:
-    double T = std::stod(argv[1]);
-    double relax = std::stod(argv[2]);
-    int JobID = std::stoi(argv[3]);
+    int mode = std::stoi(argv[1]);
+    double T = std::stod(argv[2]);
+    double relax = std::stod(argv[3]);
+    int record = std::stoi(argv[4]);
+    int JobID = std::stoi(argv[5]);
 
     // start the clock
     Stopwatch timer;
@@ -31,12 +33,13 @@ int main(int argc, const char * argv[]) {
     chaos::seed(JobID);
     
     // running the protocol
-    //Protocol::KobAndersonReplication(T, relax, &timer);
-    //Protocol::KobAndersonTest(100, &timer);
+    
+    if (mode==0) {Protocol::KobAndersonTest(T, relax, record, &timer);};
+    if (mode==1) {Protocol::SzamelTest(T, relax, record, &timer);};
     //Protocol::LennardJonesTest(5.0 ,1000, &timer);
     //Protocol::DiffusionTest(T, relax, &timer);
-    Protocol::SzamelTest(T, relax, &timer);
-
+    //Protocol::KobAndersonReplication(T, relax, &timer);
+    
     // timestamping the end
     timer.EndStamp();
     
